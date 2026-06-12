@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablas de Clasificación | LegacyCraft MC</title>
+    <meta name="description" content="Consulta los líderes del servidor: mejores niveles de McMMO, jugadores más ricos y los que más tiempo han dedicado. ¡Domina LegacyCraft!">
+    <link rel="icon" href="https://i.ibb.co/HTCnjkqh/image.png" type="image/png">
+    <style>
+        :root {
+            --bg-deep: #06060d;
+            --bg-surface: #0d0d1a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --emerald: #50C878;
+            --gold: #e2a847;
+            --purple: #a78bfa;
+            --text-primary: #e8ecf1;
+            --text-secondary: #9499a5;
+            --text-muted: #5c6170;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --shadow-card: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --font-display: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            position: relative;
+        }
+        /* ORB PARALLAX */
+        .liquid-glass-orb {
+            position: fixed; top:-20%; left:-10%; width:55vw; height:55vw; max-width:900px; max-height:900px;
+            background: radial-gradient(circle at 30% 40%, rgba(80,200,120,0.1) 0%, rgba(167,139,250,0.05) 40%, transparent 70%);
+            border-radius:50%; filter:blur(90px); z-index:0; pointer-events:none; opacity:0.7;
+            will-change:transform; transition: transform 0.1s linear;
+        }
+        .liquid-glass-orb.secondary {
+            top:auto; bottom:-15%; left:auto; right:-8%;
+            background: radial-gradient(circle at 60% 60%, rgba(226,168,71,0.08) 0%, rgba(80,200,120,0.04) 50%, transparent 75%);
+            filter:blur(100px); opacity:0.6;
+        }
+        /* CANVAS PARTÍCULAS */
+        #particlesCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        /* CONTENIDO */
+        #mainContent { position:relative; z-index:1; opacity:0; transform:translateY(10px); transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s; }
+        #mainContent.visible { opacity:1; transform:translateY(0); }
+        /* NAVBAR */
+        .navbar {
+            position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:1000;
+            width:calc(100% - 32px); max-width:1100px; background:rgba(13,13,26,0.65);
+            backdrop-filter:blur(25px); -webkit-backdrop-filter:blur(25px);
+            border:1px solid var(--glass-border); border-radius:var(--radius-xl);
+            padding:10px 24px; display:flex; align-items:center; justify-content:space-between;
+            transition:var(--transition-smooth); box-shadow:0 8px 40px rgba(0,0,0,0.5);
+        }
+        .navbar.scrolled { background:rgba(10,10,22,0.8); box-shadow:0 12px 50px rgba(0,0,0,0.7); }
+        .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; white-space:nowrap; }
+        .nav-logo img { height:32px; width:auto; border-radius:8px; filter:drop-shadow(0 0 8px rgba(80,200,120,0.4)); transition:var(--transition-bounce); }
+        .nav-logo img:hover { transform:scale(1.08); }
+        .nav-logo span {
+            font-family:var(--font-display); font-weight:800; font-size:1.2rem; letter-spacing:0.04em;
+            background:linear-gradient(135deg, #50C878, #e2a847);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+            text-shadow:0 0 8px rgba(80,200,120,0.3);
+        }
+        .nav-links { display:flex; gap:6px; list-style:none; align-items:center; }
+        .nav-links a {
+            color:var(--text-secondary); text-decoration:none; padding:10px 16px; border-radius:50px;
+            font-weight:500; font-size:0.9rem; transition:0.2s; white-space:nowrap;
+        }
+        .nav-links a:hover { color:#fff; background:rgba(255,255,255,0.05); text-shadow:0 0 6px rgba(255,255,255,0.3); }
+        .nav-links a.active-page { color:#fff; background:rgba(80,200,120,0.15); font-weight:600; }
+        .nav-cta {
+            background:linear-gradient(135deg, #50C878, #3aa860) !important; color:#000 !important;
+            font-weight:700 !important; padding:10px 20px !important; border-radius:50px !important;
+            box-shadow:0 4px 20px rgba(80,200,120,0.35); transition:var(--transition-bounce) !important; text-shadow:none !important;
+        }
+        .nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(80,200,120,0.5) !important; background:linear-gradient(135deg, #5ddb8a, #45c06e) !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:8px; z-index:1001; }
+        .hamburger span { width:26px; height:2.5px; background:#fff; border-radius:4px; transition:0.2s; }
+        .hamburger.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity:0; }
+        .hamburger.active span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+
+        /* SECTIONS */
+        .section { position:relative; z-index:1; padding:100px 24px; max-width:1100px; margin:0 auto; }
+        .section-label {
+            display:inline-block; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em;
+            color:var(--emerald); background:rgba(80,200,120,0.1); padding:6px 16px; border-radius:50px;
+            margin-bottom:16px; font-weight:600; box-shadow:0 0 15px rgba(80,200,120,0.2);
+        }
+        .section-title {
+            font-family:var(--font-display); font-size:clamp(2rem, 4.5vw, 3.2rem); font-weight:800;
+            line-height:1.15; margin-bottom:20px; letter-spacing:-0.02em;
+        }
+        .section-subtitle { color:var(--text-secondary); font-size:1.1rem; max-width:650px; margin-bottom:40px; line-height:1.7; }
+        .chrome-text {
+            background:linear-gradient(135deg, #e8ecf1 0%, #b0b8c5 25%, #f8fafc 50%, #a0aab8 75%, #dde3ed 100%);
+            background-size:200% 200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; animation:chromeShift 4s ease infinite;
+            text-shadow:0 0 18px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.1);
+        }
+        .gold-text {
+            background:linear-gradient(135deg, #e2a847 0%, #fcd68a 30%, #e2a847 50%, #c88d30 70%, #fcd68a 100%);
+            background-size:200% 200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; animation:chromeShift 5s ease infinite;
+            text-shadow:0 0 20px rgba(226,168,71,0.4), 0 0 45px rgba(226,168,71,0.15);
+        }
+        .emerald-text {
+            background:linear-gradient(135deg, #50C878 0%, #7ee8a0 40%, #50C878 60%, #3aa860 80%, #7ee8a0 100%);
+            background-size:200% 200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; animation:chromeShift 4.5s ease infinite;
+            text-shadow:0 0 22px rgba(80,200,120,0.5), 0 0 50px rgba(80,200,120,0.2);
+        }
+        @keyframes chromeShift { 0%,100%{ background-position:0% 50%; } 50%{ background-position:100% 50%; } }
+
+        /* LEADERBOARD CARDS */
+        .leaderboard-card {
+            background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-lg);
+            padding:30px 28px; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+            box-shadow:var(--shadow-card); transition:var(--transition-smooth);
+            margin-bottom:30px; position:relative; overflow:hidden;
+        }
+        .leaderboard-card:hover {
+            border-color:rgba(255,255,255,0.2); box-shadow:0 20px 55px rgba(0,0,0,0.7), 0 0 40px rgba(80,200,120,0.08);
+        }
+        .leaderboard-card h3 {
+            font-family:var(--font-display); font-weight:700; font-size:1.5rem; margin-bottom:6px;
+            display:flex; align-items:center; gap:10px;
+        }
+        .leaderboard-card .badge-icon { font-size:1.8rem; }
+        .leaderboard-card .subtitle { color:var(--text-secondary); font-size:0.9rem; margin-bottom:20px; }
+
+        /* TABLA */
+        .table-wrapper { overflow-x:auto; margin-top:10px; border-radius:var(--radius-sm); }
+        table {
+            width:100%; border-collapse:collapse; text-align:left;
+            background:rgba(0,0,0,0.2); border-radius:var(--radius-sm); overflow:hidden;
+        }
+        th {
+            font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);
+            padding:14px 18px; background:rgba(255,255,255,0.03); border-bottom:1px solid var(--glass-border);
+            font-weight:600;
+        }
+        td {
+            padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.04);
+            font-size:0.95rem; color:var(--text-primary); transition:background 0.2s;
+        }
+        tr:last-child td { border-bottom:none; }
+        tr:hover td { background:rgba(255,255,255,0.03); }
+        .rank-col { width:60px; text-align:center; font-weight:700; }
+        .player-col { font-weight:600; }
+        .value-col { font-weight:700; }
+        .gold-highlight { color:#e2a847; }
+        .silver-highlight { color:#c0c0c0; }
+        .bronze-highlight { color:#cd7f32; }
+        .empty-row td { color:var(--text-muted); font-style:italic; text-align:center; }
+
+        /* ANUNCIO APERTURA */
+        .launch-notice {
+            background:rgba(80,200,120,0.08); border:1px solid rgba(80,200,120,0.2); border-radius:var(--radius-lg);
+            padding:24px 28px; margin-bottom:30px; text-align:center; backdrop-filter:blur(10px);
+        }
+        .launch-notice p { color:var(--text-secondary); margin-bottom:0; }
+        .launch-notice strong { color:var(--emerald); }
+
+        /* REVEAL */
+        .reveal {
+            opacity:0; transform:translateY(40px); filter:blur(8px);
+            transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.8s ease;
+            will-change:transform, opacity, filter;
+        }
+        .reveal.revealed { opacity:1; transform:translateY(0); filter:blur(0); }
+        .reveal-delay-1 { transition-delay:0.1s; }
+        .reveal-delay-2 { transition-delay:0.2s; }
+        .reveal-delay-3 { transition-delay:0.3s; }
+
+        /* FOOTER */
+        .footer { text-align:center; padding:40px 24px; border-top:1px solid rgba(255,255,255,0.05); color:var(--text-muted); font-size:0.85rem; }
+        .footer a { color:var(--emerald); text-decoration:none; }
+        .footer a:hover { text-decoration:underline; }
+
+        /* BLOBS */
+        .blob { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.08; pointer-events:none; z-index:0; will-change:transform; }
+        .blob-1 { width:450px; height:450px; background:#50C878; top:-100px; right:-100px; }
+        .blob-2 { width:350px; height:350px; background:#a78bfa; bottom:-80px; left:-80px; }
+
+        /* MOBILE */
+        @media (max-width:768px) {
+            .navbar { padding:10px 16px; border-radius:var(--radius-lg); }
+            .nav-logo img { height:28px; }
+            .nav-logo span { font-size:1rem; }
+            .nav-links { position:fixed; top:0; right:-100%; width:75%; max-width:320px; height:100vh; background:rgba(13,13,26,0.95); backdrop-filter:blur(30px); flex-direction:column; padding:100px 30px 40px; gap:6px; transition:right 0.4s; border-left:1px solid var(--glass-border); z-index:999; }
+            .nav-links.active { right:0; }
+            .nav-links a { width:100%; text-align:left; padding:14px 18px; font-size:1rem; border-radius:var(--radius-sm); }
+            .hamburger { display:flex; }
+            .section { padding:70px 16px; }
+            .leaderboard-card { padding:20px 18px; }
+            th, td { padding:10px 12px; font-size:0.85rem; }
+        }
+        @media (max-width:480px) {
+            .navbar { top:8px; width:calc(100% - 16px); border-radius:var(--radius-md); padding:8px 12px; }
+            .nav-logo img { height:24px; } .nav-logo span { font-size:0.9rem; }
+        }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:10px; }
+    </style>
+</head>
+<body>
+    <div class="liquid-glass-orb" id="liquidOrb1"></div>
+    <div class="liquid-glass-orb secondary" id="liquidOrb2"></div>
+    <canvas id="particlesCanvas"></canvas>
+
+    <div id="mainContent">
+        <div class="blob blob-1" data-parallax="0.12"></div>
+        <div class="blob blob-2" data-parallax="0.08"></div>
+
+        <nav class="navbar" id="navbar">
+            <a href="index.html" class="nav-logo">
+                <img src="https://i.ibb.co/HTCnjkqh/image.png" alt="LegacyCraft Logo">
+                <span>LegacyCraft</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="index.html#trailer">Trailer</a></li>
+                <li><a href="index.html#caracteristicas">Características</a></li>
+                <li><a href="index.html#mapa">Mapa</a></li>
+                <li><a href="staff.html">Staff</a></li>
+                <li><a href="leaderboards.html" class="active-page">Clasificación</a></li>
+                <li><a href="https://discord.gg/uuAysGU3SE" target="_blank" rel="noopener" class="nav-cta">💬 Discord</a></li>
+            </ul>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Menú"><span></span><span></span><span></span></button>
+        </nav>
+
+        <section class="section" style="padding-top:140px;">
+            <span class="section-label reveal">🏆 Tablas de Clasificación</span>
+            <h2 class="section-title reveal reveal-delay-1"><span class="gold-text">Domina</span> el servidor</h2>
+            <p class="section-subtitle reveal reveal-delay-2">Conoce a los jugadores más destacados de LegacyCraft MC. ¿Tienes lo necesario para aparecer aquí?</p>
+
+            <!-- Aviso de lanzamiento -->
+            <div class="launch-notice reveal reveal-delay-1">
+                <p>🚀 <strong>El servidor abre en 3 días.</strong> Los líderes aparecerán después del lanzamiento. ¡Tú podrías estar en la cima!</p>
+            </div>
+
+            <!-- McMMO -->
+            <div class="leaderboard-card reveal reveal-delay-2">
+                <h3><span class="badge-icon">⚔️</span> <span class="gold-text">Top McMMO</span></h3>
+                <p class="subtitle">Jugadores con mayor nivel total de habilidades McMMO.</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead> <tr><th class="rank-col">#</th><th>Jugador</th><th class="value-col">Nivel Total</th></tr> </thead>
+                        <tbody id="mcmmo-table-body">
+                            <tr class="empty-row"><td colspan="3" style="text-align:center;">🏅 Próximamente: los mejores jugadores aparecerán aquí.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Economía -->
+            <div class="leaderboard-card reveal reveal-delay-3">
+                <h3><span class="badge-icon">💰</span> <span class="emerald-text">Más Ricos</span></h3>
+                <p class="subtitle">Fortunas acumuladas en la economía del servidor.</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead> <tr><th class="rank-col">#</th><th>Jugador</th><th class="value-col">Dinero</th></tr> </thead>
+                        <tbody id="economy-table-body">
+                            <tr class="empty-row"><td colspan="3" style="text-align:center;">💸 Aún no hay millonarios... ¿serás el primero?</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tiempo de juego -->
+            <div class="leaderboard-card reveal reveal-delay-4">
+                <h3><span class="badge-icon">⏳</span> <span class="chrome-text">Más Horas</span></h3>
+                <p class="subtitle">Jugadores con mayor tiempo total conectado.</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead> <tr><th class="rank-col">#</th><th>Jugador</th><th class="value-col">Horas</th></tr> </thead>
+                        <tbody id="playtime-table-body">
+                            <tr class="empty-row"><td colspan="3" style="text-align:center;">🕒 El reloj empezará a contar desde el día de apertura.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer reveal">
+            <p>© 2026 <span class="emerald-text" style="font-weight:700;">LegacyCraft MC</span>. Todos los derechos reservados.</p>
+            <p>Hecho con ❤️ para la comunidad | <a href="index.html">Inicio</a> • <a href="staff.html">Staff</a> • <a href="https://discord.gg/uuAysGU3SE" target="_blank" rel="noopener">Discord</a></p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // Mostrar contenido tras carga simulada
+            const main = document.getElementById('mainContent');
+            window.addEventListener('DOMContentLoaded', () => { setTimeout(() => main.classList.add('visible'), 50); });
+
+            // Canvas de partículas
+            const canvas = document.getElementById('particlesCanvas'), ctx = canvas.getContext('2d');
+            let particles = [], mouseX=-1000, mouseY=-1000;
+            const isMobile = window.innerWidth < 768;
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resizeCanvas(); window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+            function initParticles() {
+                const count = isMobile ? 30 : 70;
+                particles = [];
+                for(let i=0; i<count; i++) {
+                    particles.push({
+                        x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+                        size: Math.random()*2.5+0.8, speedX: (Math.random()-0.5)*0.3, speedY: (Math.random()-0.5)*0.3-0.15,
+                        opacity: Math.random()*0.5+0.2, pulse: Math.random()*Math.PI*2, pulseSpeed: Math.random()*0.02+0.008,
+                        color: ['#50C878','#e2a847','#a78bfa','#ffffff'][Math.floor(Math.random()*4)]
+                    });
+                }
+            }
+            initParticles();
+            document.addEventListener('mousemove', e => { mouseX=e.clientX; mouseY=e.clientY; });
+            document.addEventListener('mouseleave', () => { mouseX=-1000; mouseY=-1000; });
+            document.addEventListener('touchmove', e => { mouseX=e.touches[0].clientX; mouseY=e.touches[0].clientY; }, {passive:true});
+            document.addEventListener('touchend', () => { mouseX=-1000; mouseY=-1000; });
+            function animateParticles() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.x += p.speedX; p.y += p.speedY; p.pulse += p.pulseSpeed;
+                    const pf = Math.sin(p.pulse)*0.3+0.7, op = p.opacity*pf;
+                    if(!isMobile && mouseX>-100 && mouseY>-100) {
+                        const dx=mouseX-p.x, dy=mouseY-p.y, dist=Math.sqrt(dx*dx+dy*dy);
+                        if(dist<160) { const f=(160-dist)/160*0.025; p.x+=dx*f; p.y+=dy*f; }
+                    }
+                    if(p.x<-10)p.x=canvas.width+10; if(p.x>canvas.width+10)p.x=-10;
+                    if(p.y<-10)p.y=canvas.height+10; if(p.y>canvas.height+10)p.y=-10;
+                    const c = p.color.replace('#50C878','80,200,120').replace('#e2a847','226,168,71').replace('#a78bfa','167,139,250').replace('#ffffff','255,255,255');
+                    ctx.fillStyle = `rgba(${c},${op})`; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+                    ctx.fillStyle = `rgba(${c},${op*0.2})`; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2,0,Math.PI*2); ctx.fill();
+                });
+                if(!isMobile) for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+                    const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+                    if(dist<90) { ctx.strokeStyle=`rgba(255,255,255,${0.03*(1-dist/90)})`; ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke(); }
+                }
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+
+            // Parallax orbes
+            const orb1=document.getElementById('liquidOrb1'), orb2=document.getElementById('liquidOrb2'), blobs=document.querySelectorAll('.blob[data-parallax]');
+            function updateParallax() {
+                const s=window.scrollY;
+                if(orb1) orb1.style.transform = `translate(${s*0.02}px, ${s*-0.03}px)`;
+                if(orb2) orb2.style.transform = `translate(${s*-0.03}px, ${s*0.04}px)`;
+                blobs.forEach(b => { const f=parseFloat(b.getAttribute('data-parallax'))||0.1; b.style.transform=`translateY(${s*f}px)`; });
+            }
+            window.addEventListener('scroll', updateParallax, {passive:true}); updateParallax();
+
+            // Reveal on scroll
+            const revealEls = document.querySelectorAll('.reveal');
+            const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('revealed'); obs.unobserve(e.target); } }); }, {threshold:0.2, rootMargin:'0px 0px -30px 0px'});
+            revealEls.forEach(el => obs.observe(el));
+
+            // Navbar scroll
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => { if(window.scrollY>30) navbar.classList.add('scrolled'); else navbar.classList.remove('scrolled'); });
+
+            // Hamburguesa
+            const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks');
+            hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); navLinks.classList.toggle('active'); });
+            document.querySelectorAll('[data-nav-close]').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('active'); navLinks.classList.remove('active'); }));
+            document.addEventListener('click', e => { if(!navbar.contains(e.target) && navLinks.classList.contains('active')) { hamburger.classList.remove('active'); navLinks.classList.remove('active'); } });
+        })();
+    </script>
+</body>
+</html>

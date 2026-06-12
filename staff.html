@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff & Administración | LegacyCraft MC</title>
+    <meta name="description" content="Conoce al equipo de administración de LegacyCraft MC. Liderado por pipeprogamer89, pronto nuevos administradores mediante encuestas.">
+    <link rel="icon" href="https://i.ibb.co/HTCnjkqh/image.png" type="image/png">
+    <style>
+        :root {
+            --bg-deep: #06060d;
+            --bg-surface: #0d0d1a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover: rgba(255, 255, 255, 0.06);
+            --emerald: #50C878;
+            --emerald-glow: rgba(80, 200, 120, 0.5);
+            --gold: #e2a847;
+            --gold-glow: rgba(226, 168, 71, 0.5);
+            --purple: #a78bfa;
+            --purple-glow: rgba(167, 139, 250, 0.4);
+            --text-primary: #e8ecf1;
+            --text-secondary: #9499a5;
+            --text-muted: #5c6170;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --shadow-card: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 60px rgba(80, 200, 120, 0.15);
+            --font-display: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            cursor: default;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ============ PARALLAX LIQUID GLASS ORB ============ */
+        .liquid-glass-orb {
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 55vw;
+            height: 55vw;
+            max-width: 900px;
+            max-height: 900px;
+            background: radial-gradient(circle at 30% 40%, rgba(80, 200, 120, 0.1) 0%, rgba(167, 139, 250, 0.05) 40%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: 0;
+            pointer-events: none;
+            will-change: transform;
+            transition: transform 0.1s linear;
+            opacity: 0.7;
+        }
+        .liquid-glass-orb.secondary {
+            top: auto;
+            bottom: -15%;
+            left: auto;
+            right: -8%;
+            background: radial-gradient(circle at 60% 60%, rgba(226, 168, 71, 0.08) 0%, rgba(80, 200, 120, 0.04) 50%, transparent 75%);
+            filter: blur(100px);
+            opacity: 0.6;
+        }
+
+        /* ============ CANVAS DE PARTÍCULAS ============ */
+        #particlesCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============ CONTENIDO PRINCIPAL ============ */
+        #mainContent {
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
+        }
+        #mainContent.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============ NAVBAR ============ */
+        .navbar {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: calc(100% - 32px);
+            max-width: 1100px;
+            background: rgba(13, 13, 26, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-smooth);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+        .navbar.scrolled {
+            background: rgba(10, 10, 22, 0.8);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.7);
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .nav-logo img {
+            height: 32px;
+            width: auto;
+            border-radius: 8px;
+            filter: drop-shadow(0 0 8px rgba(80, 200, 120, 0.4));
+            transition: var(--transition-bounce);
+        }
+        .nav-logo img:hover {
+            transform: scale(1.08);
+        }
+        .nav-logo span {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: 0.04em;
+            background: linear-gradient(135deg, #50C878, #e2a847);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 8px rgba(80, 200, 120, 0.3);
+        }
+        .nav-links {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition-fast);
+            position: relative;
+            white-space: nowrap;
+        }
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+        }
+        .nav-links a.active-page {
+            color: #fff;
+            background: rgba(80, 200, 120, 0.15);
+            font-weight: 600;
+        }
+        .nav-cta {
+            background: linear-gradient(135deg, #50C878, #3aa860) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            padding: 10px 20px !important;
+            border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(80, 200, 120, 0.35);
+            transition: var(--transition-bounce) !important;
+            text-shadow: none !important;
+        }
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(80, 200, 120, 0.5) !important;
+            background: linear-gradient(135deg, #5ddb8a, #45c06e) !important;
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+            z-index: 1001;
+        }
+        .hamburger span {
+            width: 26px;
+            height: 2.5px;
+            background: #fff;
+            border-radius: 4px;
+            transition: var(--transition-fast);
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============ SECTIONS ============ */
+        .section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .section-label {
+            display: inline-block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--emerald);
+            background: rgba(80, 200, 120, 0.1);
+            padding: 6px 16px;
+            border-radius: 50px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(80, 200, 120, 0.2);
+        }
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+        .chrome-text {
+            background: linear-gradient(135deg, #e8ecf1 0%, #b0b8c5 25%, #f8fafc 50%, #a0aab8 75%, #dde3ed 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: chromeShift 4s ease infinite;
+            text-shadow: 0 0 18px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+        .gold-text {
+            background: linear-gradient(135deg, #e2a847 0%, #fcd68a 30%, #e2a847 50%, #c88d30 70%, #fcd68a 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: chromeShift 5s ease infinite;
+            text-shadow: 0 0 20px rgba(226, 168, 71, 0.4), 0 0 45px rgba(226, 168, 71, 0.15);
+        }
+        .emerald-text {
+            background: linear-gradient(135deg, #50C878 0%, #7ee8a0 40%, #50C878 60%, #3aa860 80%, #7ee8a0 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: chromeShift 4.5s ease infinite;
+            text-shadow: 0 0 22px rgba(80, 200, 120, 0.5), 0 0 50px rgba(80, 200, 120, 0.2);
+        }
+        @keyframes chromeShift {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* ============ STAFF CARD PRINCIPAL ============ */
+        .staff-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: center;
+            max-width: 700px;
+            margin: 0 auto;
+            border-top: 2px solid rgba(80, 200, 120, 0.3);
+            border-bottom: 2px solid rgba(80, 200, 120, 0.3);
+        }
+        .staff-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(80, 200, 120, 0.5);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(80, 200, 120, 0.2);
+        }
+        .staff-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(80, 200, 120, 0.06) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        .staff-card:hover::before {
+            opacity: 1;
+        }
+        .staff-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #50C878, #e2a847);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 0 30px rgba(80, 200, 120, 0.4), 0 0 60px rgba(80, 200, 120, 0.2);
+            flex-shrink: 0;
+            position: relative;
+            animation: avatarGlow 3s ease-in-out infinite;
+        }
+        @keyframes avatarGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(80, 200, 120, 0.4), 0 0 60px rgba(80, 200, 120, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 45px rgba(80, 200, 120, 0.7), 0 0 80px rgba(226, 168, 71, 0.3);
+            }
+        }
+        .staff-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .staff-name {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .staff-role {
+            display: inline-block;
+            background: rgba(80, 200, 120, 0.15);
+            color: var(--emerald);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            border: 1px solid rgba(80, 200, 120, 0.25);
+        }
+        .staff-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 16px;
+        }
+        .staff-badge {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .staff-badge.gold {
+            border-color: rgba(226, 168, 71, 0.3);
+            color: #e2a847;
+        }
+        .staff-bio {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ============ FUTUROS STAFF ============ */
+        .future-staff {
+            background: var(--glass-bg);
+            border: 1px dashed var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 36px 28px;
+            text-align: center;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: var(--shadow-card);
+            max-width: 700px;
+            margin: 30px auto 0;
+            transition: var(--transition-smooth);
+        }
+        .future-staff:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+        .future-staff h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+        .future-staff p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-body);
+            letter-spacing: 0.01em;
+        }
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .btn .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        /* ============ REVEAL ON SCROLL ============ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            filter: blur(8px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.8s ease;
+            will-change: transform, opacity, filter;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+        .reveal-delay-2 {
+            transition-delay: 0.2s;
+        }
+        .reveal-delay-3 {
+            transition-delay: 0.3s;
+        }
+        .reveal-delay-4 {
+            transition-delay: 0.4s;
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+        .footer a {
+            color: var(--emerald);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============ BLOBS ============ */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            will-change: transform;
+            transition: transform 0.08s linear;
+        }
+        .blob-1 {
+            width: 450px;
+            height: 450px;
+            background: #50C878;
+            top: -100px;
+            right: -100px;
+        }
+        .blob-2 {
+            width: 350px;
+            height: 350px;
+            background: #a78bfa;
+            bottom: -80px;
+            left: -80px;
+        }
+
+        /* ============ MOBILE ============ */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 16px;
+                border-radius: var(--radius-lg);
+            }
+            .nav-logo img {
+                height: 28px;
+            }
+            .nav-logo span {
+                font-size: 1rem;
+            }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75%;
+                max-width: 320px;
+                height: 100vh;
+                background: rgba(13, 13, 26, 0.95);
+                backdrop-filter: blur(30px);
+                -webkit-backdrop-filter: blur(30px);
+                flex-direction: column;
+                padding: 100px 30px 40px;
+                gap: 6px;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border-left: 1px solid var(--glass-border);
+                z-index: 999;
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .nav-links a {
+                width: 100%;
+                text-align: left;
+                padding: 14px 18px;
+                font-size: 1rem;
+                border-radius: var(--radius-sm);
+            }
+            .hamburger {
+                display: flex;
+            }
+            .section {
+                padding: 70px 16px;
+            }
+            .staff-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 20px;
+            }
+            .staff-badges {
+                justify-content: center;
+            }
+            .blob {
+                display: none;
+            }
+            .liquid-glass-orb {
+                opacity: 0.3;
+            }
+        }
+        @media (max-width: 480px) {
+            .staff-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+            .staff-name {
+                font-size: 1.4rem;
+            }
+            .navbar {
+                top: 8px;
+                width: calc(100% - 16px);
+                border-radius: var(--radius-md);
+                padding: 8px 12px;
+            }
+            .nav-logo img {
+                height: 24px;
+            }
+            .nav-logo span {
+                font-size: 0.9rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="liquid-glass-orb" id="liquidOrb1"></div>
+    <div class="liquid-glass-orb secondary" id="liquidOrb2"></div>
+
+    <canvas id="particlesCanvas"></canvas>
+
+    <div id="mainContent">
+        <div class="blob blob-1" data-parallax="0.12"></div>
+        <div class="blob blob-2" data-parallax="0.08"></div>
+
+        <nav class="navbar" id="navbar">
+            <a href="index.html" class="nav-logo">
+                <img src="https://i.ibb.co/HTCnjkqh/image.png" alt="LegacyCraft Logo">
+                <span>LegacyCraft</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="index.html#trailer">Trailer</a></li>
+                <li><a href="index.html#caracteristicas">Características</a></li>
+                <li><a href="index.html#mapa">Mapa</a></li>
+                <li><a href="staff.html" class="active-page">Staff</a></li>
+                <li><a href="https://discord.gg/uuAysGU3SE" target="_blank" rel="noopener" class="nav-cta">💬 Discord</a></li>
+            </ul>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Menú"><span></span><span></span><span></span></button>
+        </nav>
+
+        <section class="section" style="padding-top: 140px;">
+            <span class="section-label reveal">👑 Staff & Administración</span>
+            <h2 class="section-title reveal reveal-delay-1">
+                <span class="gold-text">Conoce</span> al equipo
+            </h2>
+            <p class="section-subtitle reveal reveal-delay-2">
+                El servidor está liderado por un equipo comprometido con la calidad y la comunidad.
+                Actualmente, toda la administración recae en nuestro fundador, y pronto se sumarán nuevos
+                miembros mediante un proceso de selección transparente.
+            </p>
+
+            <!-- TARJETA PRINCIPAL: pipeprogamer89 -->
+            <div class="staff-card reveal reveal-delay-3">
+                <div class="staff-avatar">🛡️</div>
+                <div class="staff-info">
+                    <h3 class="staff-name chrome-text">pipeprogamer89</h3>
+                    <span class="staff-role">Fundador & Administrador</span>
+                    <div class="staff-badges">
+                        <span class="staff-badge gold">👑 Owner</span>
+                        <span class="staff-badge">💻 Programador</span>
+                        <span class="staff-badge">⚙️ Encargado</span>
+                        <span class="staff-badge">🛡️ Admin</span>
+                    </div>
+                    <p class="staff-bio">
+                        Creador y líder absoluto de LegacyCraft MC. Responsable del desarrollo técnico,
+                        la configuración del servidor, los sistemas de economía y protección, así como
+                        de la visión general del proyecto. Comprometido con ofrecer la mejor experiencia
+                        de juego posible y mantener una comunidad sana y activa.
+                    </p>
+                </div>
+            </div>
+
+            <!-- FUTUROS STAFF -->
+            <div class="future-staff reveal reveal-delay-4">
+                <h3 class="gold-text">🌟 Próximos Administradores</h3>
+                <p>
+                    A finales de junio abriremos encuestas y formularios de aprobación para que los miembros
+                    más activos y comprometidos de la comunidad puedan postularse como administradores.
+                    ¡Tu oportunidad de ayudar a construir LegacyCraft!
+                </p>
+                <a href="https://discord.gg/uuAysGU3SE" target="_blank" rel="noopener" class="btn btn-outline">
+                    <span class="btn-icon">📋</span> Estar atento en Discord
+                </a>
+            </div>
+        </section>
+
+        <footer class="footer reveal">
+            <p>© 2026 <span class="emerald-text" style="font-weight:700;">LegacyCraft MC</span>. Todos los derechos reservados.</p>
+            <p>Hecho con ❤️ para la comunidad | <a href="index.html">Inicio</a> • <a href="https://discord.gg/uuAysGU3SE" target="_blank" rel="noopener">Discord</a> • <a href="https://chat.whatsapp.com/CHHFDCz8dHl0KjOiOa1Fbb" target="_blank" rel="noopener">WhatsApp</a></p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // ============ AUDIO ENGINE ============
+            let audioCtx = null;
+
+            function initAudio() {
+                if (!audioCtx) {
+                    try {
+                        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) { audioCtx = null; }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }
+
+            function playSound(freq, type, duration, vol = 0.08, glide = 0) {
+                if (!audioCtx) return;
+                try {
+                    const t = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, t);
+                    if (glide) osc.frequency.linearRampToValueAtTime(freq + glide, t + duration);
+                    gain.gain.setValueAtTime(vol, t);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t);
+                    osc.stop(t + duration);
+                } catch (e) {}
+            }
+
+            function sfxHover() { playSound(600, 'sine', 0.1, 0.04); }
+
+            function sfxClick() { playSound(200, 'sine', 0.15, 0.06, 300); }
+
+            // Mostrar contenido
+            const main = document.getElementById('mainContent');
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    main.classList.add('visible');
+                }, 100);
+            });
+
+            // ============ CANVAS DE PARTÍCULAS ============
+            const canvas = document.getElementById('particlesCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let mouseX = -1000,
+                mouseY = -1000;
+            const isMobile = window.innerWidth < 768;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', () => { resizeCanvas();
+                initParticles(); });
+
+            function initParticles() {
+                const count = isMobile ? 30 : 70;
+                particles = [];
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        size: Math.random() * 2.5 + 0.8,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3 - 0.15,
+                        opacity: Math.random() * 0.5 + 0.2,
+                        pulse: Math.random() * Math.PI * 2,
+                        pulseSpeed: Math.random() * 0.02 + 0.008,
+                        color: ['#50C878', '#e2a847', '#a78bfa', '#ffffff'][Math.floor(Math.random() * 4)],
+                    });
+                }
+            }
+            initParticles();
+
+            document.addEventListener('mousemove', e => { mouseX = e.clientX;
+                mouseY = e.clientY; });
+            document.addEventListener('mouseleave', () => { mouseX = -1000;
+                mouseY = -1000; });
+            document.addEventListener('touchmove', e => { mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY; }, { passive: true });
+            document.addEventListener('touchend', () => { mouseX = -1000;
+                mouseY = -1000; });
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.pulse += p.pulseSpeed;
+                    const pf = Math.sin(p.pulse) * 0.3 + 0.7,
+                        op = p.opacity * pf;
+                    if (!isMobile && mouseX > -100 && mouseY > -100) {
+                        const dx = mouseX - p.x,
+                            dy = mouseY - p.y,
+                            dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 160) { const f = (160 - dist) / 160 * 0.025;
+                            p.x += dx * f;
+                            p.y += dy * f; }
+                    }
+                    if (p.x < -10) p.x = canvas.width + 10;
+                    if (p.x > canvas.width + 10) p.x = -10;
+                    if (p.y < -10) p.y = canvas.height + 10;
+                    if (p.y > canvas.height + 10) p.y = -10;
+                    const c = p.color.replace('#50C878', '80,200,120').replace('#e2a847', '226,168,71')
+                        .replace('#a78bfa', '167,139,250').replace('#ffffff', '255,255,255');
+                    ctx.fillStyle = `rgba(${c},${op})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = `rgba(${c},${op*0.2})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                if (!isMobile)
+                    for (let i = 0; i < particles.length; i++)
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x,
+                                dy = particles[i].y - particles[j].y,
+                                dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 90) {
+                                ctx.strokeStyle = `rgba(255,255,255,${0.03*(1-dist/90)})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+
+            // ============ PARALLAX ============
+            const orb1 = document.getElementById('liquidOrb1'),
+                orb2 = document.getElementById('liquidOrb2'),
+                blobs = document.querySelectorAll('.blob[data-parallax]');
+
+            function updateParallax() {
+                const s = window.scrollY;
+                if (orb1) orb1.style.transform = `translate(${s*0.02}px, ${s*-0.03}px)`;
+                if (orb2) orb2.style.transform = `translate(${s*-0.03}px, ${s*0.04}px)`;
+                blobs.forEach(b => {
+                    const f = parseFloat(b.getAttribute('data-parallax')) || 0.1;
+                    b.style.transform = `translateY(${s*f}px)`;
+                });
+            }
+            window.addEventListener('scroll', updateParallax, { passive: true });
+            updateParallax();
+
+            // ============ REVEAL ON SCROLL ============
+            const revealEls = document.querySelectorAll('.reveal');
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('revealed');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: '0px 0px -30px 0px' });
+            revealEls.forEach(el => obs.observe(el));
+
+            // ============ NAVBAR SCROLL ============
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 30) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            });
+
+            // ============ HAMBURGER ============
+            const hamburger = document.getElementById('hamburgerBtn'),
+                navLinks = document.getElementById('navLinks');
+            hamburger.addEventListener('click', () => {
+                initAudio();
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                sfxClick();
+            });
+            document.querySelectorAll('[data-nav-close]').forEach(l => {
+                l.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+            document.addEventListener('click', e => {
+                if (!navbar.contains(e.target) && navLinks.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+            });
+
+            // ============ HOVER SOUNDS ============
+            document.querySelectorAll('.btn, .staff-card, .future-staff, .nav-links a').forEach(el => {
+                el.addEventListener('mouseenter', () => { initAudio();
+                    sfxHover(); });
+            });
+            document.querySelectorAll('.btn').forEach(el => {
+                el.addEventListener('click', () => { initAudio();
+                    sfxClick(); });
+            });
+
+            document.addEventListener('click', initAudio, { once: true });
+            document.addEventListener('touchstart', initAudio, { once: true });
+        })();
+    </script>
+</body>
+</html>
